@@ -11,7 +11,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "test": "node --experimental-strip-types --test tests/*.test.mjs",
+    "template:generate": "node scripts/generate-marketing-template.mjs"
   },
   "dependencies": {
     "xlsx": "^0.18.5",
@@ -60,7 +62,8 @@
     "typescript": "5.9.3",
     "vinext": "1.0.0-beta.5",
     "vite": "8.0.13",
-    "wrangler": "4.92.0"
+    "wrangler": "4.92.0",
+    "fflate": "^0.7.5"
   },
   "type": "module",
   "overrides": {
