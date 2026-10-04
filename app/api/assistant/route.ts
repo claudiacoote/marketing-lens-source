@@ -1,8 +1,7 @@
-import { env } from 'cloudflare:workers';
 import { z } from 'zod';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { analyse, profiles, fmt, labels } from '@/lib/analysis';
-const configuration=()=>{const values=env as unknown as Record<string,string|undefined>;return {key:values.OPENAI_API_KEY,model:values.OPENAI_MODEL||'gpt-6-astra'};};
+const configuration=()=>({key:process.env.OPENAI_API_KEY,model:process.env.OPENAI_MODEL||'gpt-6-astra'});
 export async function GET(){return Response.json({configured:!!configuration().key});}
 const schema=z.object({question:z.string().min(1).max(2000),rows:z.array(z.record(z.union([z.string(),z.number(),z.boolean(),z.null()]))).min(1).max(5000),mapping:z.array(z.object({name:z.string().max(150),meaning:z.string().max(50),type:z.string(),confidence:z.string(),missing:z.number().nonnegative()})).max(100),profile:z.object({id:z.string(),name:z.string().max(150),role:z.string().max(150),priorities:z.string().max(2000),preferred:z.array(z.string()).max(30),secondary:z.array(z.string()).max(30),style:z.string().max(2000),detail:z.string(),terminology:z.string(),deemphasise:z.string(),questions:z.array(z.string()).max(5),orientation:z.string(),controls:z.array(z.number().min(0).max(100)).length(5)})});
 export async function POST(request:Request){
