@@ -20,6 +20,10 @@ test('partial month-end reporting is excluded from every stakeholder headline co
     assert.equal(result.current.values.spend, 24300);
     assert.equal(result.metrics.find(metric => metric.key === 'revenue')?.value, reference.metrics.find(metric => metric.key === 'revenue')?.value);
     assert.equal(result.metrics.find(metric => metric.key === 'revenue')?.change, reference.metrics.find(metric => metric.key === 'revenue')?.change);
+    for (const key of ['spend','revenue','leads','mqls','sqls','conversions','customers','pipeline']) {
+      assert.equal(result.current.values[key], reference.current.values[key], `${id} current ${key} must use the shared current period`);
+      assert.equal(result.previous.values[key], reference.previous.values[key], `${id} previous ${key} must use the shared comparison period`);
+    }
     assert.equal(result.trend.at(-1).period, '2026-09');
     assert.equal(result.trend.at(-1).status, 'partial');
     assert.match(result.issues.join(' '), /2026-09 data is incomplete through 5 September/);
@@ -27,6 +31,9 @@ test('partial month-end reporting is excluded from every stakeholder headline co
     assert.equal(result.metrics.find(metric => metric.key === 'revenue')?.absoluteChange, 10000);
   }
   const sales = results.find(([id]) => id === 'sales')[1];
+  const finance = results.find(([id]) => id === 'finance')[1];
+  assert.ok(finance.compoundInsights.some(insight => insight.id === 'revenue-outpaces-spend'));
+  assert.ok(finance.compoundInsights.some(insight => insight.id === 'customers-cac'));
   assert.equal(sales.current.values.leadToSql, 399 / 1026 * 100);
   assert.equal(sales.previous.values.leadToSql, 360 / 980 * 100);
   assert.equal(sales.current.values.leadToMql, 620 / 1026 * 100);
