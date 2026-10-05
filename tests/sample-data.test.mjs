@@ -38,11 +38,20 @@ test('the demo consumes the canonical 36-row sample dataset', () => {
 test('the generated workbook example sheet round-trips through the upload parser', () => {
   const workbook = XLSX.readFile(new URL(templatePath), { cellDates: true });
   assert.deepEqual(workbook.SheetNames, ['Marketing data', 'Example data', 'Instructions']);
+  const expectedHeaders = ['Date','Channel','Platform','Placement','Campaign','Campaign ID','Creative','Region','Product','Spend','Revenue','Impressions','Reach','Clicks','Leads','MQLs','SQLs','Conversions','Customers','Pipeline','Gross profit','Budget','Email opens','Website traffic'];
+  assert.deepEqual(XLSX.utils.sheet_to_json(workbook.Sheets['Marketing data'], { header: 1, range: 0, blankrows: false })[0], expectedHeaders);
+  assert.equal(workbook.Sheets['Marketing data']['!ref'], 'A1:X101', '100 blank data-entry rows are formatted beneath the headers');
   const templateRows = XLSX.utils.sheet_to_json(workbook.Sheets['Marketing data'], { defval: null });
   assert.equal(templateRows.length, 0, 'the user input sheet should remain blank');
 
   const uploadedRows = XLSX.utils.sheet_to_json(workbook.Sheets['Example data'], { defval: null });
   assert.equal(uploadedRows.length, canonicalRows.length);
+  assert.ok(uploadedRows.some(row => row.Platform === 'Meta' && row.Placement === 'Facebook'));
+  assert.ok(uploadedRows.some(row => row.Platform === 'Meta' && row.Placement === 'Instagram'));
+  assert.ok(uploadedRows.some(row => row.Platform === 'LinkedIn' && row.Placement === 'Feed'));
+  assert.ok(uploadedRows.some(row => row.Platform === 'Google Ads' && row.Placement === 'Search'));
+  assert.ok(uploadedRows.some(row => row.Channel === 'Email'));
+  assert.ok(uploadedRows.some(row => row.Channel === 'Organic'));
   for (let index = 0; index < canonicalRows.length; index += 1) {
     const canonical = canonicalRows[index];
     const uploaded = uploadedRows[index];
@@ -69,4 +78,3 @@ test('the generated workbook example sheet round-trips through the upload parser
     assert.ok(actual !== undefined && actual !== null && Math.abs(actual - change) < 0.15, `${metric} change was ${actual}%`);
   }
 });
-

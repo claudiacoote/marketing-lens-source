@@ -6,7 +6,7 @@ import { zipSync, unzipSync } from 'fflate';
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const workbookPath = path.join(projectRoot, 'public/templates/lens-marketing-data-template.xlsx');
 const sampleRows = JSON.parse(await readFile(path.join(projectRoot, 'data/sample-marketing-data.json'), 'utf8'));
-const headers = ['Date', 'Channel', 'Campaign', 'Creative', 'Region', 'Product', 'Spend', 'Revenue', 'Impressions', 'Reach', 'Clicks', 'Leads', 'MQLs', 'SQLs', 'Conversions', 'Customers', 'Pipeline', 'Gross profit', 'Budget', 'Email opens', 'Website traffic', 'Platform', 'Placement', 'Campaign ID'];
+const headers = ['Date', 'Channel', 'Platform', 'Placement', 'Campaign', 'Campaign ID', 'Creative', 'Region', 'Product', 'Spend', 'Revenue', 'Impressions', 'Reach', 'Clicks', 'Leads', 'MQLs', 'SQLs', 'Conversions', 'Customers', 'Pipeline', 'Gross profit', 'Budget', 'Email opens', 'Website traffic'];
 
 if (sampleRows.length > 100) throw new Error('The example data sheet is prepared for up to 100 records.');
 
@@ -72,4 +72,3 @@ const updatedSheetData = `<${prefix}sheetData>${rows.join('')}</${prefix}sheetDa
 entries[worksheetPath] = encode(worksheetXml.replace(sheetDataMatch[0], updatedSheetData));
 await writeFile(workbookPath, zipSync(entries, { level: 6 }));
 console.log(`Updated Example data with ${sampleRows.length} canonical sample records.`);
-
